@@ -1,0 +1,45 @@
+<script>
+// This event is fired with the user accepts the input in the omnibox.
+
+var queries = new Array(
+	"http://maps.google.com/maps?q=",
+	"http://www.yelp.com/search?find_desc=",
+	"http://www.facebook.com/search?q=",
+	"http://www.google.com/search?q=" + "-site:yelp.com+-site:facebook.com+-site:maps.google.com+"
+	);
+chrome.omnibox.onInputEntered.addListener(
+  function(text) {
+	var search = text.replace(" ", "+");
+	
+	chrome.tabs.update(null,{
+		active: true,
+		url: queries[0] + search
+	});
+	for (var i = 1; i < queries.length; i++) {
+		chrome.tabs.create({
+			active: false,
+			url: queries[i] + search
+		});
+	}
+	/*
+	chrome.tabs.create({
+		active: false,
+		url: "http://www.google.com/search?q=" + search
+	});
+	chrome.tabs.create({
+		active: false,
+		url: "http://www.yelp.com/search?find_desc=" + search
+	});
+	chrome.tabs.create({
+		active: false,
+		url: "http://www.facebook.com/search?q=" + search
+	});
+	chrome.tabs.create({
+		active: false,
+		url: "http://www.google.com/search?q=" + search + "+-site:yelp.com+-site:facebook.com+-site:maps.google.com"
+	});
+	*/
+  //abbreviated: google, fb, yelp, 
+  //other: google search 
+  });
+</script>

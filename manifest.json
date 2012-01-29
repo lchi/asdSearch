@@ -1,0 +1,13 @@
+{
+  "name": "asdSearch Extension",
+  "description": "Search many websites at once!",
+  "version": "1.0",
+  "omnibox": { "keyword" : "asd" },
+  "icons": {
+    "16": "face-monkey-2.png"
+  },
+  "permissions": [
+    "tabs"
+  ],
+  "background_page": "asdSearch.html"
+}
