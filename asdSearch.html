@@ -2,20 +2,48 @@
 // This event is fired with the user accepts the input in the omnibox.
 
 var queries = new Array(
-	"http://maps.google.com/maps?q=",
 	"http://www.yelp.com/search?find_desc=",
+	"http://maps.google.com/maps?q=",
 	"http://www.facebook.com/search?q=",
 	"http://www.google.com/search?q=" + "-site:yelp.com+-site:facebook.com+-site:maps.google.com+"
 	);
+	
+function isZipCode(str) {
+	// regex found on StackOverflow
+	// http://stackoverflow.com/questions/160550/zip-code-us-postal-code-validation
+	return str.match(/(^\d{5}$)|(^\d{5}-\d{4}$)/) != null;
+}
+
+function replaceAll(str, expr, repl) {
+	while(str.match(expr) != null) {
+		str = str.replace(expr, repl);
+	}
+	return str;
+}
 chrome.omnibox.onInputEntered.addListener(
-  function(text) {
-	var search = text.replace(" ", "+");
+  function(query) {
+	var splitQuery = query.split(" ");
+	var temp = splitQuery.pop();
+	var zip = isZipCode(temp) ? temp : null;
+	var search = replaceAll(splitQuery.toString(), ",", "+");
+	
+	var yelpQuery = queries[0] + search;
+	if(zip != null){
+		yelpQuery += "&find_loc=" + zip
+	} else {
+		if(search.length == 0) {
+			search = temp;
+		} else {
+			search += "+"+temp;
+		}
+		yelpQuery = queries[0] + search;
+	}	
 	
 	chrome.tabs.update(null,{
 		active: true,
-		url: queries[0] + search
+		url: yelpQuery
 	});
-	for (var i = 1; i < queries.length; i++) {
+	for (var i = 1; i < queries.length; i++) {		
 		chrome.tabs.create({
 			active: false,
 			url: queries[i] + search
